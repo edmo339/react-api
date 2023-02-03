@@ -8,7 +8,8 @@ const CLIENT_SECRET = "d5fe8f22936040868f90ce3ca06e75fe";
 
 function App() {
   const [searchInput, setSearchInput] = useState("");
-  const [accesToken, setAccessToken] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+  const [albums, setalbums, ] = useState([]);
 
   useEffect(() => {
     // API Access Token
@@ -34,7 +35,7 @@ function App() {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + accesToken
+      'Authorization': 'Bearer ' + accessToken
     }
   }
   var artistID = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist', searchParamaters )
@@ -43,13 +44,15 @@ function App() {
 
   console.log("Artist ID is " + artistID)
   // Get request with artist to grab all the albums for that artist
-  var albums = await fetch('https//api.spotify.com/v1/artists/' + artistID + '/albums' + '?include_groups=album&market=US&limit=10', searchParamaters)
+  var returnedAlbums = await fetch('https//api.spotify.com/v1/artists/' + artistID + '/albums' + '?include_groups=album&market=US&limit=10', searchParamaters)
     .then(response => response.json())
     .then(data => {
-      console.log(data)
+      console.log(data);
+      setalbums(data.items);
     });
   // Display those albums to user
   }
+  console.log(albums);
   return (
     <div className="App">
       <Container>
@@ -70,12 +73,17 @@ function App() {
         </InputGroup>
           <Container>
             <Row className='mx-2 row row-cols-4'>
-            <Card>
-              <Card.Img src='#'/>
-              <Card.Body>
-              <Card.Title>Album Name</Card.Title>
-              </Card.Body>
-            </Card>
+              {albums.map( (album, i) => {
+                console.log(album);
+                return (
+              <Card>
+               <Card.Img src={album.images[0].url} />
+                  <Card.Body>
+                    <Card.Title>{album.name}</Card.Title>
+                  </Card.Body>
+              </Card>
+                )
+              })}
             
             </Row>
           </Container>
